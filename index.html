@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title></title>
+    <script>
+        "use strict";
+        let ctx;
+        let score = 0;
+        let prob = 0.99;
+        let basketX = 0;
+        let timerId = NaN;
+        let back, basket, chick, egg1, egg2;
+        let eggs = [];
+
+        window.addEventListener("DOMContentLoaded", () => {
+            ctx = document.getElementById("field").getContext("2d");
+            ctx.font = "32px 'Times New Roman'";
+            back = document.getElementById("back");
+            basket = document.getElementById("basket");
+            chick = document.getElementById("chick");
+            egg1 = document.getElementById("egg1");
+            egg2 = document.getElementById("egg2");
+
+            timerId = setInterval(tick, 25);
+            field.onpointermove = (e) => {
+                basketX = e.offsetX;
+            };
+        });
+
+        function tick() {
+            ctx.drawImage(back, 0, 0);
+            ctx.drawImage(basket, basketX -50, 500);
+
+            if ( Math.random() > prob) {
+                eggs.push({ x: Math.random() * 500, y: 1});
+            };
+            let prev = eggs.length;
+            eggs = eggs.filter((e) => {
+                return (
+                    e.y < 400 || e.y > 600 || e.x < basketX - 110 || e.x > basketX + 60
+                );
+            });
+            if (prev != eggs.length) {
+                score++;
+                prob -= 0.001;
+            };
+
+            ctx.fillStyle = "green";
+            ctx.fillText("Score: " + score, 400, 250);
+
+            eggs.forEach((e) => {
+                e.y += e.y * 0.05;
+                if (e.y < 50) {
+                    ctx.drawImage(chick, e.x, 10);
+                } else {
+                    ctx.drawImage(egg1, e.x, e.y)
+                }
+
+                if (e.y > 550){
+                    clearInterval(timerId);
+                    ctx.fillText("GAME OVER", 200, 300);
+                    ctx.drawImage(egg2, e.x, 500);
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+    <canvas id="field" width="600" height="600"></canvas>
+    <img class="none" id="back" src="images/back.png">
+    <img class="none" id="basket" src="images/basket.png">
+    <img class="none" id="chick" src="images/chick.png">
+    <img class="none" id="egg1" src="images/egg1.png">
+    <img class="none" id="egg2" src="images/egg2.png">
+</body>
+</html>
